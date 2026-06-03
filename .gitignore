@@ -1,0 +1,36 @@
+# Local secrets and runtime state
+.env
+.env.*
+!.env.example
+data/
+uploads/
+static/users/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+mcp/server/mcp_server/.venv/
+
+# Local logs and OS files
+*.log
+.DS_Store
+
+# Private or non-portfolio legacy modules kept out of the public build
+mcp/server/mcp_server/modules/*meeting*/
+mcp/server/mcp_server/modules/*paper*/
+mcp/server/mcp_server/modules/*patent*/
+mcp/server/mcp_server/modules/a3d/
+mcp/server/mcp_server/modules/manim/
+tools_services/
+*_llm.py

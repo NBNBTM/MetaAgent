@@ -1,0 +1,37 @@
+{
+  "global": {
+    "server_name": "MetaAgent Public Tools",
+    "debug": false,
+    "log_level": "INFO",
+    "transport": "stdio",
+    "dependencies": [
+      "numpy",
+      "pandas",
+      "scikit-learn",
+      "matplotlib",
+      "seaborn",
+      "scipy",
+      "sympy"
+    ]
+  },
+  "modules": {
+    "internet_time": {
+      "enabled": true
+    },
+    "calculator": {
+      "enabled": true
+    },
+    "data_analysis": {
+      "enabled": true,
+      "default_clustering_method": "kmeans",
+      "default_dimension_reduction_method": "pca",
+      "default_classification_method": "random_forest"
+    },
+    "data_visualization": {
+      "enabled": true,
+      "default_figure_size": [10, 6],
+      "default_style": "seaborn",
+      "supported_plot_types": ["line", "bar", "scatter", "pie", "box"]
+    }
+  }
+}

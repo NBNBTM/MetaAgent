@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "general": {
+      "command": "python",
+      "args": ["mcp/server/mcp_server/main.py"],
+      "timeout": 30000
+    },
+    "tavily-search": {
+      "command": "npx",
+      "args": ["-y", "tavily-mcp"],
+      "env": {
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+      },
+      "disabled": true,
+      "description": "Optional public web-search MCP service. Enable after setting TAVILY_API_KEY."
+    }
+  }
+}

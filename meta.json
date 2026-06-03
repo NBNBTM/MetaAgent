@@ -1,0 +1,49 @@
+[
+  {
+    "name": "通用工具",
+    "description": "基础通用能力，包括联网时间查询、星期查询和时间偏移计算。",
+    "prompt": "我是通用工具助手，可以处理日期、时间和基础辅助任务。",
+    "tools": ["get_internet_time", "get_weekday", "shift_time"]
+  },
+  {
+    "name": "基础计算",
+    "description": "数学计算能力，包括表达式计算、方程求解、统计量、导数、积分、相关系数、线性回归和矩阵运算。",
+    "prompt": "我是基础计算助手，可以完成数学表达式、统计分析和线性代数相关计算。",
+    "tools": [
+      "calculate",
+      "solve_equation",
+      "differentiate",
+      "integrate",
+      "mean",
+      "variance",
+      "standard_deviation",
+      "median",
+      "mode",
+      "correlation_coefficient",
+      "linear_regression",
+      "confidence_interval",
+      "matrix_addition",
+      "matrix_multiplication",
+      "matrix_transpose"
+    ]
+  },
+  {
+    "name": "数据分析",
+    "description": "基于 pandas、numpy 和 scikit-learn 的公开演示数据分析能力，支持数据质量检查、缺失值处理、标准化、分类、聚类和降维。",
+    "prompt": "我是数据分析助手，可以读取用户上传的数据文件并执行基础机器学习分析。",
+    "tools": [
+      "check_data_quality",
+      "handle_missing_values",
+      "standardize_data",
+      "perform_classification",
+      "perform_clustering",
+      "perform_dimension_reduction"
+    ]
+  },
+  {
+    "name": "数据绘图",
+    "description": "基于 matplotlib 的公开演示数据可视化能力，支持折线图、柱状图、散点图、饼图和箱线图。",
+    "prompt": "我是数据绘图助手，可以根据上传数据生成常见图表。",
+    "tools": ["check_visualization_data", "plot_line", "plot_bar", "plot_scatter", "plot_pie", "plot_box"]
+  }
+]

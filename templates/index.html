@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaAgent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js" defer></script>
+    <script src="/static/js/app.js" defer></script>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar">
+            <header class="brand">
+                <img src="/static/img/logo.png" alt="MetaAgent" class="brand-logo">
+                <div>
+                    <strong>MetaAgent</strong>
+                    <span>个人作品集版</span>
+                </div>
+            </header>
+
+            <button class="primary-action" id="new-session-btn" type="button">新建会话</button>
+
+            <section class="panel">
+                <div class="panel-title">智能体</div>
+                <div id="agent-list" class="agent-list" aria-live="polite"></div>
+                <button class="ghost-action" id="reset-agents-btn" type="button">重置智能体</button>
+            </section>
+
+            <section class="panel sessions-panel">
+                <div class="panel-title">会话</div>
+                <div id="session-list" class="session-list" aria-live="polite"></div>
+            </section>
+
+            <section class="panel danger-zone">
+                <button class="ghost-action danger" id="delete-current-btn" type="button">删除当前会话</button>
+                <button class="ghost-action danger" id="delete-all-btn" type="button">清空全部会话</button>
+            </section>
+        </aside>
+
+        <main class="chat-main">
+            <header class="topbar">
+                <button class="icon-button" id="sidebar-toggle" type="button" aria-label="切换侧边栏">☰</button>
+                <div>
+                    <h1 id="session-title">新对话</h1>
+                    <p id="session-subtitle">元智能体会根据任务创建合适的工具助手</p>
+                </div>
+                <button class="icon-button" id="theme-toggle" type="button" aria-label="切换主题">◐</button>
+            </header>
+
+            <section class="messages" id="messages" aria-live="polite"></section>
+
+            <form class="composer" id="composer">
+                <div class="mention-box hidden" id="mention-box"></div>
+                <textarea id="user-input" rows="1" placeholder="描述你的任务，或输入 @ 选择智能体"></textarea>
+                <div class="composer-actions">
+                    <input type="file" id="file-input" hidden>
+                    <button class="tool-button" id="upload-btn" type="button">上传</button>
+                    <button class="send-button" id="send-btn" type="submit">发送</button>
+                </div>
+            </form>
+        </main>
+    </div>
+</body>
+</html>
