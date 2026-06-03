@@ -1,14 +1,19 @@
 # MetaAgent
 
+[![Tests](https://github.com/NBNBTM/MetaAgent/actions/workflows/tests.yml/badge.svg)](https://github.com/NBNBTM/MetaAgent/actions/workflows/tests.yml)
+[![Release](https://img.shields.io/github/v/release/NBNBTM/MetaAgent)](https://github.com/NBNBTM/MetaAgent/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](License)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg)](https://www.python.org/)
+
 MetaAgent is a portfolio-ready web chat application that demonstrates a **meta-agent + MCP tool-calling workflow**. A user describes a task, the meta-agent decides which capability group is needed, creates or selects a specialized agent, and the selected agent can call public MCP tools to complete the task.
 
 This repository is the public version of the project. It is designed to be reproducible, safe to publish, and easy to run locally.
 
-## Screenshots
+## Demo
 
-![MetaAgent home screen](docs/images/metaagent-home.png)
+![MetaAgent demo](docs/images/metaagent-demo.gif)
 
-![MetaAgent tool-routing chat](docs/images/metaagent-chat.png)
+Static fallback images are available at [`docs/images/metaagent-home.png`](docs/images/metaagent-home.png) and [`docs/images/metaagent-chat.png`](docs/images/metaagent-chat.png).
 
 ## Highlights
 
@@ -17,6 +22,7 @@ This repository is the public version of the project. It is designed to be repro
 - **Streaming chat UI**: supports SSE streaming, Markdown rendering, tool-call cards, file upload UI, dark mode, and responsive layout.
 - **SQLite-backed state**: stores users, sessions, messages, agents, and upload metadata in a local SQLite database.
 - **Public-safe project shape**: excludes local secrets, runtime data, upload files, private services, and user history from Git.
+- **Repository hygiene checks**: CI verifies tests and checks that secrets, runtime data, and private legacy markers are not tracked.
 
 ## Architecture
 
@@ -37,6 +43,7 @@ Core directories:
 - `mcp/server/mcp_server/`: public demo MCP tool server.
 - `templates/` and `static/`: single-page web chat interface.
 - `tests/`: backend and API tests.
+- `scripts/`: repository hygiene and README asset generation helpers.
 
 ## What It Can Do
 
@@ -119,6 +126,8 @@ Try these prompts in the web UI:
 - `UPLOAD_DIR`: local upload directory.
 - `MCP_SERVER_CONFIG_PATH`: MCP server configuration file.
 - `METAAGENT_PYTHON_PATH`: optional Python interpreter path for MCP subprocesses.
+- `SECRET_KEY`: local Quart session secret. Use a unique value outside local demos.
+- `TAVILY_API_KEY`: optional key for the disabled-by-default Tavily MCP server.
 
 ## Local Data and Privacy
 
@@ -147,11 +156,29 @@ pytest
 Repository hygiene checks:
 
 ```bash
-rg -n "sk-[A-Za-z0-9]|tvly-[A-Za-z0-9]|Bearer [A-Za-z0-9]|verify=False"
-git ls-files .env 'data/**' 'static/users/**' '*__pycache__*'
+python scripts/check_repository_hygiene.py
 ```
 
-The first command should not find real secrets. The second command should not output tracked runtime data.
+Regenerate the README GIF after updating screenshots:
+
+```bash
+pip install -e ".[docs]"
+python scripts/generate_readme_gif.py
+```
+
+The GIF should always be generated from clean demo data, never from personal chat history.
+
+## Repository Configuration
+
+This project includes the public repository basics expected for a portfolio project:
+
+- GitHub Actions test workflow: `.github/workflows/tests.yml`
+- Dependabot update checks: `.github/dependabot.yml`
+- Repository hygiene script: `scripts/check_repository_hygiene.py`
+- Public contribution guidance: `CONTRIBUTING.md`
+- Security and secret-handling notes: `SECURITY.md`
+- Editor defaults: `.editorconfig`
+- Portfolio readiness checklist: `docs/PROJECT_CHECKLIST.md`
 
 ## Portfolio Notes
 

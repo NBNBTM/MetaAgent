@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   pytest:
@@ -25,3 +29,6 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+      - name: Check repository hygiene
+        run: python scripts/check_repository_hygiene.py
