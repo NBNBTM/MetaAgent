@@ -9,6 +9,12 @@ MetaAgent is a portfolio-ready web chat application that demonstrates a **meta-a
 
 This repository is the public version of the project. It is designed to be reproducible, safe to publish, and easy to run locally.
 
+## Project Context and Contribution
+
+The internship system I worked with already had its primary backend workflow. My internship contribution focused on the web experience: reorganizing the information architecture, clarifying sessions and agent state, improving streaming-response and tool-call feedback, refining upload and error interactions, supporting agent mentions, and improving responsive behavior.
+
+After the internship, I prepared this separate public portfolio edition to demonstrate the general meta-agent and MCP interaction pattern. The public edition adds and consolidates local SQLite-backed state, public-safe tool configuration, fallback behavior, tests, documentation, demo assets, and repository hygiene checks while excluding company-specific services, credentials, runtime data, uploads, and user history. It is not a publication of the original internal system and does not imply employer endorsement.
+
 ## Demo
 
 ![MetaAgent demo](docs/images/metaagent-demo.gif)
