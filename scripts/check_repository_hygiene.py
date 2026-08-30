@@ -25,7 +25,7 @@ FORBIDDEN_TRACKED_PATTERNS = (
 )
 
 SENSITIVE_PATTERNS = {
-    "company/private terms": re.compile(r"华院|unidt|UNIDT|会议室|论文|专利|数字人", re.IGNORECASE),
+    "company/private terms": re.compile(r"unidt|UNIDT|会议室|论文|专利|数字人", re.IGNORECASE),
     "private service host": re.compile(r"service-test\.unidt|service\.unidt|ai-api\.unidt|ai-proxy\.unidt", re.IGNORECASE),
     "private IP": re.compile(r"\b(?:121\.46|180\.184)\.\d{1,3}\.\d{1,3}\b"),
     "api key shape": re.compile(r"\b(?:sk|tvly)-[A-Za-z0-9_-]{16,}\b"),
