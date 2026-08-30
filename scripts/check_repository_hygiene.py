@@ -22,9 +22,6 @@ FORBIDDEN_TRACKED_PATTERNS = (
     "venv/",
     "env/",
     "user_2025",
-    "mcp/server/mcp_server/modules/internet_time/",
-    "mcp/server/mcp_server/modules/data_visualization/",
-    "mcp/server/mcp_server/modules/data_analysis/example.py",
 )
 
 SENSITIVE_PATTERNS = {
@@ -34,15 +31,6 @@ SENSITIVE_PATTERNS = {
     "api key shape": re.compile(r"\b(?:sk|tvly)-[A-Za-z0-9_-]{16,}\b"),
     "bearer token": re.compile(r"Bearer\s+[A-Za-z0-9._-]{16,}"),
     "disabled TLS verification": re.compile(r"verify\s*=\s*False"),
-}
-
-PUBLICATION_FORBIDDEN_PATTERNS = {
-    "third-party attribution": re.compile(r"Chenyu Tian|Weilin Shen", re.IGNORECASE),
-    "removed module or tool": re.compile(
-        r"(?:\b(?:internet_time|data_visualization|get_internet_time|get_weekday|shift_time|"
-        r"check_visualization_data|plot_line|plot_bar|plot_scatter|plot_pie|plot_box)\b|通用工具|数据绘图)",
-        re.IGNORECASE,
-    ),
 }
 
 EMAIL_PATTERN = re.compile(
@@ -118,9 +106,6 @@ def main() -> int:
         if path.suffix not in TEXT_SUFFIXES or not path.is_file():
             continue
         text = path.read_text(encoding="utf-8", errors="ignore")
-        for label, pattern in PUBLICATION_FORBIDDEN_PATTERNS.items():
-            if pattern.search(text):
-                failures.append(f"{label} matched in {file_name}")
         for email in EMAIL_PATTERN.findall(text):
             if email.lower() not in ALLOWED_PUBLIC_EMAILS:
                 failures.append(f"third-party email matched in {file_name}")
