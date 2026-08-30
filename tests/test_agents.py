@@ -17,15 +17,16 @@ def build_service(tmp_path):
     return service, store
 
 
-def test_agent_service_adds_common_tool_to_composed_agent(tmp_path):
+def test_agent_service_keeps_only_available_requested_servers(tmp_path):
     service, _store = build_service(tmp_path)
 
-    agent = service.upsert_agent_from_payload("u1", {"name": "分析助手", "servers": ["数据分析", "数据绘图"]})
+    agent = service.upsert_agent_from_payload(
+        "u1",
+        {"name": "分析助手", "servers": ["数据分析", "不存在的工具"]},
+    )
 
     assert agent["name"] == "分析助手"
-    assert agent["servers"][0] == "通用工具"
-    assert "数据分析" in agent["servers"]
-    assert "数据绘图" in agent["servers"]
+    assert agent["servers"] == ["数据分析"]
 
 
 def test_agent_service_extracts_json_payload(tmp_path):

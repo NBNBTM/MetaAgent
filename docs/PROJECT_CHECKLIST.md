@@ -28,10 +28,8 @@ The app stores local chat/session state in SQLite and uploaded files under the c
 
 Enabled public demo modules:
 
-- `internet_time`
 - `calculator`
 - `data_analysis`
-- `data_visualization`
 
 Private, company-specific, or high-risk local filesystem tools are not enabled in the public MCP catalog.
 

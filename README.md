@@ -55,10 +55,8 @@ Core directories:
 
 The public demo tool catalog includes:
 
-- **General utilities**: internet time, weekday, and time shifting.
 - **Calculator tools**: expression evaluation, equations, derivatives, integrals, statistics, regression, and matrix operations.
 - **Data analysis tools**: data quality checks, missing-value handling, standardization, classification, clustering, and dimensionality reduction.
-- **Data visualization tools**: line, bar, scatter, pie, and box plots from uploaded tabular data.
 
 ## Model and API Key Behavior
 
@@ -116,9 +114,7 @@ Try these prompts in the web UI:
 
 - `Calculate the mean and standard deviation of 12, 18, 21, and 30.`
 - `Solve x**2 - 5*x + 6 = 0.`
-- `What day of the week is it in Beijing today? What date is three days later?`
 - `I uploaded a CSV file. Check its data quality and summarize missing values.`
-- `Create a bar chart from the uploaded data.`
 
 ## Environment Variables
 
