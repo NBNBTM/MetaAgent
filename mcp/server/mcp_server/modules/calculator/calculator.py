@@ -4,7 +4,7 @@ import numpy as np
 from scipy import stats
 from sympy import symbols, solve, sympify, diff
 from sympy import integrate as sympy_integrate
-from typing import Dict, List, Tuple, Any, Optional, Union
+from typing import List, Tuple
 
 
 class Calculator(ModuleInterface):

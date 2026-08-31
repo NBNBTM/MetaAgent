@@ -1,6 +1,4 @@
 """MCP Server适配器，整合核心系统和FastMCP。"""
-import os
-from pathlib import Path
 from fastmcp import FastMCP, Context
 from core.config_manager import ConfigManager
 from core.module_loader import ModuleLoader
@@ -58,7 +56,7 @@ class MCPServer:
             self: 服务器实例，用于链式调用
         """
         # 加载启用的模块
-        modules = self.module_loader.load_enabled_modules()
+        self.module_loader.load_enabled_modules()
         # 注册模块功能
         for module_name, module in self.registry.get_all_modules().items():
             try:

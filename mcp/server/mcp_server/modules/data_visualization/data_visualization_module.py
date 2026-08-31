@@ -1,7 +1,6 @@
 from core.module_interface import ModuleInterface
 from .data_visualization_service import DataVisualizationService
-from typing import List, Dict, Optional, Union
-import os
+from typing import List, Optional, Union
 
 class DataVisualizationModule(ModuleInterface):
     """

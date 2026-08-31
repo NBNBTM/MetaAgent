@@ -1,6 +1,5 @@
 """配置管理器，负责加载和管理全局配置。"""
 import json
-import os
 from pathlib import Path
 class ConfigManager:
     """
@@ -37,7 +36,7 @@ class ConfigManager:
         """
         return {
             "global": {
-                "server_name": "MCP Server",
+                "server_name": "MetaAgent Public Tools",
                 "debug": False,
                 "log_level": "INFO",
                 "transport": "stdio",
@@ -46,23 +45,29 @@ class ConfigManager:
                     "pandas",
                     "scikit-learn",
                     "matplotlib",
-                    "seaborn"
+                    "seaborn",
+                    "scipy",
+                    "sympy"
                 ]
             },
             "modules": {
-                "hello_world": {
-                    "enabled": True,
-                    "message": "Hello, {}!"
+                "internet_time": {
+                    "enabled": True
+                },
+                "calculator": {
+                    "enabled": True
                 },
                 "data_analysis": {
                     "enabled": True,
                     "default_clustering_method": "kmeans",
                     "default_dimension_reduction_method": "pca",
-                    "default_classification_method": "random_forest",
-                    "visualization": {
-                        "default_figure_size": [10, 6],
-                        "supported_methods": ["scatter", "heatmap"]
-                    }
+                    "default_classification_method": "random_forest"
+                },
+                "data_visualization": {
+                    "enabled": True,
+                    "default_figure_size": [10, 6],
+                    "default_style": "seaborn",
+                    "supported_plot_types": ["line", "bar", "scatter", "pie", "box"]
                 }
             }
         }

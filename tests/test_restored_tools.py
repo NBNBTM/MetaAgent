@@ -21,6 +21,20 @@ def load_restored_modules(monkeypatch):
     return time_module.InternetTime, visualization_module.DataVisualizationModule
 
 
+def test_fallback_config_matches_public_modules(monkeypatch, tmp_path):
+    monkeypatch.syspath_prepend(str(SERVER_ROOT))
+    config_manager = importlib.import_module("core.config_manager")
+
+    config = config_manager.ConfigManager(tmp_path / "missing-config.json")
+
+    assert set(config.get_modules_config()) == {
+        "internet_time",
+        "calculator",
+        "data_analysis",
+        "data_visualization",
+    }
+
+
 @pytest.mark.asyncio
 async def test_restored_modules_register_all_public_tools(monkeypatch):
     InternetTime, DataVisualizationModule = load_restored_modules(monkeypatch)

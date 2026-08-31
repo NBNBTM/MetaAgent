@@ -1,8 +1,6 @@
 from core.module_interface import ModuleInterface
 from .data_analysis_service import DataAnalysisService
-import pandas as pd
-import numpy as np
-from typing import List, Dict, Optional, Union
+from typing import List, Optional, Union
 
 class DataAnalysisModule(ModuleInterface):
     """

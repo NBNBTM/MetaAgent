@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
-from typing import Dict, List, Union, Optional, Tuple
+from typing import Dict, List, Union, Optional
 import os
 import json
 import logging
@@ -746,7 +746,7 @@ class DataAnalysisService:
                 # 计算AUC和AP分数
                 stats['auc_score'] = float(roc_auc_score(y_test, proba[:, 1]))
                 stats['average_precision'] = float(average_precision_score(y_test, proba[:, 1]))
-            except:
+            except Exception:
                 pass
 
         # 更新统计信息
@@ -818,7 +818,7 @@ class DataAnalysisService:
         try:
             silhouette_scores = silhouette_samples(df.drop(columns=['cluster', 'sample_index']), labels)
             df['silhouette_score'] = silhouette_scores
-        except:
+        except Exception:
             pass
 
         # 保存数据
@@ -841,7 +841,7 @@ class DataAnalysisService:
                 'calinski_harabasz_score': float(calinski_harabasz),
                 'davies_bouldin_score': float(davies_bouldin)
             }
-        except:
+        except Exception:
             pass
 
         # 计算每个聚类的统计信息
