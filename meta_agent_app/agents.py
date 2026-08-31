@@ -87,6 +87,8 @@ class AgentService:
             name = str(item).strip()
             if name in self.catalog_by_name and name not in valid:
                 valid.append(name)
+        if valid and "通用工具" in self.catalog_by_name and "通用工具" not in valid:
+            valid.insert(0, "通用工具")
         return valid
 
     def find_agent_by_servers(self, user_id: str, servers: list[str]) -> dict[str, Any] | None:
@@ -123,11 +125,17 @@ class AgentService:
         keyword_map = {
             "基础计算": ["计算", "方程", "均值", "标准差", "矩阵", "导数", "积分", "math", "calculate"],
             "数据分析": ["数据", "分类", "聚类", "降维", "机器学习", "csv", "excel"],
+            "数据绘图": ["图", "可视化", "折线", "柱状", "饼图", "散点"],
+            "通用工具": ["时间", "日期", "星期", "今天", "明天"],
         }
         for server, keywords in keyword_map.items():
             if server in self.catalog_by_name and any(keyword in text for keyword in keywords):
                 servers.append(server)
-        readable = "".join(server.replace("工具", "") for server in servers) or "通用"
+        if not servers and "通用工具" in self.catalog_by_name:
+            servers = ["通用工具"]
+        if "通用工具" in self.catalog_by_name and "通用工具" not in servers:
+            servers.insert(0, "通用工具")
+        readable = "".join(server.replace("工具", "") for server in servers if server != "通用工具") or "通用"
         return {"name": f"{readable}助手", "servers": servers}
 
     def catalog_prompt(self) -> str:

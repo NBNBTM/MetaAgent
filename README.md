@@ -15,6 +15,8 @@ The internship system I worked with already had its primary backend workflow. My
 
 After the internship, I prepared this separate public portfolio edition to demonstrate the general meta-agent and MCP interaction pattern. The public edition adds and consolidates local SQLite-backed state, public-safe tool configuration, fallback behavior, tests, documentation, demo assets, and repository hygiene checks while excluding company-specific services, credentials, runtime data, uploads, and user history. It is not a publication of the original internal system and does not imply employer endorsement.
 
+The restored internet-time and data-visualization modules retain their original individual author attribution. See [Third-Party Notices](THIRD_PARTY_NOTICES.md) for the module-level contribution boundary. No third-party personal email address is republished.
+
 ## Demo
 
 ![MetaAgent demo](docs/images/metaagent-demo.gif)
@@ -55,8 +57,10 @@ Core directories:
 
 The public demo tool catalog includes:
 
+- **General utilities**: internet time, weekday, and time shifting.
 - **Calculator tools**: expression evaluation, equations, derivatives, integrals, statistics, regression, and matrix operations.
 - **Data analysis tools**: data quality checks, missing-value handling, standardization, classification, clustering, and dimensionality reduction.
+- **Data visualization tools**: line, bar, scatter, pie, and box plots from uploaded tabular data.
 
 ## Model and API Key Behavior
 
@@ -114,7 +118,9 @@ Try these prompts in the web UI:
 
 - `Calculate the mean and standard deviation of 12, 18, 21, and 30.`
 - `Solve x**2 - 5*x + 6 = 0.`
+- `What day of the week is it in Beijing today? What date is three days later?`
 - `I uploaded a CSV file. Check its data quality and summarize missing values.`
+- `Create a bar chart from the uploaded data.`
 
 ## Environment Variables
 
@@ -194,4 +200,4 @@ This public version focuses on the core engineering story:
 
 ## License
 
-MIT License.
+MIT License. Module-level third-party attribution is documented in [Third-Party Notices](THIRD_PARTY_NOTICES.md).

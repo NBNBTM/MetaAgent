@@ -28,8 +28,10 @@ The app stores local chat/session state in SQLite and uploaded files under the c
 
 Enabled public demo modules:
 
+- `internet_time`
 - `calculator`
 - `data_analysis`
+- `data_visualization`
 
 Private, company-specific, or high-risk local filesystem tools are not enabled in the public MCP catalog.
 
@@ -68,3 +70,4 @@ Configured for the public portfolio repository:
 - Real LLM reasoning and live tool-calling conversations require a user-provided API key.
 - Uploaded files remain on the local machine unless the user deploys the app elsewhere.
 - Optional external MCP services are disabled unless explicitly configured.
+- `get_internet_time` accepts a caller-provided URL; production deployments should add URL allowlisting and private-address blocking.

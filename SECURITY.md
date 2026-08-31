@@ -23,3 +23,7 @@ By default, MetaAgent stores local runtime data under `data/`:
 - `data/uploads/`
 
 These files are local development artifacts and should not be uploaded to GitHub.
+
+## Outbound Network Requests
+
+The `get_internet_time` MCP tool accepts a caller-provided `server` URL and sends an outbound HTTP `HEAD` request with a 10-second timeout. This preserves the public demo interface, but it should not be exposed to untrusted users or networks without an application-level URL allowlist and private-address blocking. Treat every supplied URL as untrusted input.
