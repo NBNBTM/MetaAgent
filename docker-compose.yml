@@ -1,0 +1,16 @@
+services:
+  metaagent:
+    build:
+      context: .
+    ports:
+      - "18899:18899"
+    env_file:
+      - .env
+    environment:
+      METAAGENT_DATA_DIR: /app/data
+    volumes:
+      - metaagent-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  metaagent-data:

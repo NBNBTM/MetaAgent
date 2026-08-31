@@ -1,0 +1,56 @@
+name: Bug report
+description: Report a reproducible problem in the public MetaAgent edition.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include API keys, private data, uploaded file contents, or company information.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem summary
+      description: Describe what happened and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest sequence that reproduces the problem.
+      placeholder: |
+        1. Start MetaAgent with ...
+        2. Open ...
+        3. Submit ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: MetaAgent version or commit
+      placeholder: v0.2.0 or a commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: python
+    attributes:
+      label: Python version
+      options:
+        - Python 3.11
+        - Python 3.12
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Remove credentials, local paths, personal data, and uploaded content before pasting logs.
+      render: shell
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed secrets, private data, and company information from this report.
+          required: true

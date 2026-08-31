@@ -5,7 +5,7 @@ import uuid
 from pathlib import Path
 from typing import Any, AsyncIterator
 
-from quart import Quart, Response, jsonify, make_response, render_template, request, send_from_directory
+from quart import Quart, Response, jsonify, make_response, render_template, request, send_from_directory, session as browser_session
 from werkzeug.utils import secure_filename
 
 from .agents import AgentService, USER_AVATAR
@@ -47,6 +47,8 @@ def create_app(settings: Settings | None = None) -> Quart:
     app = Quart(__name__, static_folder=str(settings.base_dir / "static"), template_folder=str(settings.base_dir / "templates"))
     app.secret_key = settings.secret_key
     app.config["MAX_CONTENT_LENGTH"] = 50 * 1000 * 1000
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.extensions["settings"] = settings
     app.extensions["store"] = store
     app.extensions["agents"] = agents
@@ -61,24 +63,19 @@ def create_app(settings: Settings | None = None) -> Quart:
     async def index() -> Response:
         response = await make_response(await render_template("index.html"))
         _set_security_headers(response)
-        user_id, is_new = _ensure_user(request, store, agents)
-        if is_new:
-            response.set_cookie("user_id", user_id, httponly=True, samesite="Lax")
+        _ensure_user(request, store, agents)
         return response
 
     @app.route("/api/bootstrap")
     async def bootstrap() -> Response:
-        user_id, is_new = _ensure_user(request, store, agents)
+        user_id, _ = _ensure_user(request, store, agents)
         session = store.get_or_create_session(user_id, request.args.get("session_id"))
         payload = _bootstrap_payload(user_id, session["id"], store, agents)
-        response = await make_response(jsonify(payload))
-        if is_new:
-            response.set_cookie("user_id", user_id, httponly=True, samesite="Lax")
-        return response
+        return jsonify(payload)
 
     @app.route("/api/sessions", methods=["GET", "POST"])
     async def sessions_api() -> Response:
-        user_id, is_new = _ensure_user(request, store, agents)
+        user_id, _ = _ensure_user(request, store, agents)
         if request.method == "POST":
             data = await request.get_json(silent=True) or {}
             session = store.create_session(
@@ -89,10 +86,7 @@ def create_app(settings: Settings | None = None) -> Quart:
             payload = {"session": session, "sessions": store.list_sessions(user_id), "messages": []}
         else:
             payload = {"sessions": store.list_sessions(user_id)}
-        response = await make_response(jsonify(payload))
-        if is_new:
-            response.set_cookie("user_id", user_id, httponly=True, samesite="Lax")
-        return response
+        return jsonify(payload)
 
     @app.route("/api/sessions/<session_id>", methods=["GET", "PATCH", "DELETE"])
     async def session_api(session_id: str) -> Response:
@@ -173,15 +167,19 @@ def create_app(settings: Settings | None = None) -> Quart:
 
     @app.route("/uploads/<user_id>/<session_id>/<path:filename>")
     async def uploaded_file(user_id: str, session_id: str, filename: str) -> Response:
+        current_user_id, _ = _ensure_user(request, store, agents)
+        if current_user_id != user_id or not store.get_session(user_id, session_id):
+            return jsonify({"error": "File not found"}), 404
         directory = settings.upload_dir / user_id / session_id
         return await send_from_directory(directory, filename, as_attachment=False)
 
-    @app.route("/stream")
+    @app.route("/stream", methods=["POST"])
     async def stream_api() -> Response:
         user_id, _ = _ensure_user(request, store, agents)
-        session = store.get_or_create_session(user_id, request.args.get("session_id"))
-        user_input = (request.args.get("userinput") or "").strip()
-        selected_agent = request.args.get("selected_agent") or session["selected_agent"] or "元智能体"
+        data = await request.get_json(silent=True) or {}
+        session = store.get_or_create_session(user_id, data.get("session_id"))
+        user_input = (data.get("userinput") or "").strip()
+        selected_agent = data.get("selected_agent") or session["selected_agent"] or "元智能体"
 
         async def generate() -> AsyncIterator[str]:
             if not user_input:
@@ -418,11 +416,12 @@ def _bootstrap_payload(user_id: str, session_id: str, store: SQLiteStore, agents
     }
 
 
-def _ensure_user(request_obj: Any, store: SQLiteStore, agents: AgentService) -> tuple[str, bool]:
-    user_id = request_obj.cookies.get("user_id")
+def _ensure_user(_request_obj: Any, store: SQLiteStore, agents: AgentService) -> tuple[str, bool]:
+    user_id = browser_session.get("user_id")
     is_new = False
     if not user_id:
         user_id = str(uuid.uuid4())
+        browser_session["user_id"] = user_id
         is_new = True
     store.ensure_user(user_id)
     agents.ensure_user_defaults(user_id)

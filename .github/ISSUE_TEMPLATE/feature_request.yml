@@ -1,0 +1,42 @@
+name: Feature request
+description: Suggest an improvement for the public portfolio edition.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Requests must stay within the public-safe MetaAgent and MCP scope.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: Explain the user need before describing a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful change and its expected result.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Web UI
+        - Meta-agent routing
+        - MCP tools
+        - Storage and sessions
+        - Documentation and deployment
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Public boundary
+      options:
+        - label: This request does not require private services, private data, or company-specific code.
+          required: true

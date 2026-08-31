@@ -1,10 +1,10 @@
 [project]
 name = "metaagent"
-version = "0.1.1"
+version = "0.2.0"
 description = "A portfolio-ready MetaAgent chat app that routes tasks to MCP tools."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Lindsey Yang" },
 ]
@@ -14,7 +14,6 @@ classifiers = [
     "Framework :: AsyncIO",
     "Framework :: Quart",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -45,11 +44,16 @@ test = [
     "pytest>=8.2.0",
     "pytest-asyncio>=0.23.0",
 ]
+e2e = [
+    "playwright>=1.55.0",
+    "pytest>=8.2.0",
+]
 docs = [
     "Pillow>=10.0.0",
 ]
 dev = [
     "Pillow>=10.0.0",
+    "playwright>=1.55.0",
     "pytest>=8.2.0",
     "pytest-asyncio>=0.23.0",
 ]
@@ -61,8 +65,15 @@ Issues = "https://github.com/NBNBTM/MetaAgent/issues"
 Releases = "https://github.com/NBNBTM/MetaAgent/releases"
 
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["app"]
+
+[tool.setuptools.packages.find]
+include = ["meta_agent_app*"]
+namespaces = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

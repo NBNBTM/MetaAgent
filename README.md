@@ -1,6 +1,7 @@
 # MetaAgent
 
 [![Tests](https://github.com/NBNBTM/MetaAgent/actions/workflows/tests.yml/badge.svg)](https://github.com/NBNBTM/MetaAgent/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/NBNBTM/MetaAgent/actions/workflows/codeql.yml/badge.svg)](https://github.com/NBNBTM/MetaAgent/actions/workflows/codeql.yml)
 [![Release](https://img.shields.io/github/v/release/NBNBTM/MetaAgent)](https://github.com/NBNBTM/MetaAgent/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](License)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg)](https://www.python.org/)
@@ -83,7 +84,8 @@ Install and run:
 python --version
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -e .
 cp .env.example .env
 ```
 
@@ -111,6 +113,25 @@ Production-style local launch:
 ```bash
 hypercorn app:app --bind 127.0.0.1:18899
 ```
+
+## Docker
+
+Docker keeps dependencies isolated and stores runtime data in the `metaagent-data` Docker volume. Copy the environment template and add your own API key before starting:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Open `http://127.0.0.1:18899`. The image runs Hypercorn as a non-root user. `.env`, Git history, local databases, uploads, tests, and documentation assets are excluded from the image build context.
+
+Stop the service with:
+
+```bash
+docker compose down
+```
+
+Use `docker compose down --volumes` only when you also want to delete the container's saved conversations and uploads.
 
 ## Demo Prompts
 
@@ -158,7 +179,8 @@ rm -rf data uploads
 Run:
 
 ```bash
-pytest
+python -m pip install -e ".[test]"
+python -m pytest
 ```
 
 Repository hygiene checks:
@@ -181,10 +203,16 @@ The GIF should always be generated from clean demo data, never from personal cha
 This project includes the public repository basics expected for a portfolio project:
 
 - GitHub Actions test workflow: `.github/workflows/tests.yml`
+- Python 3.11 and 3.12 CI coverage
+- Docker image build and web-start smoke testing
+- Playwright desktop/mobile browser workflow testing
+- CodeQL analysis for Python and JavaScript: `.github/workflows/codeql.yml`
 - Dependabot update checks: `.github/dependabot.yml`
 - Repository hygiene script: `scripts/check_repository_hygiene.py`
 - Public contribution guidance: `CONTRIBUTING.md`
 - Security and secret-handling notes: `SECURITY.md`
+- Release history: `CHANGELOG.md`
+- Docker and Docker Compose launch paths
 - Editor defaults: `.editorconfig`
 - Portfolio readiness checklist: `docs/PROJECT_CHECKLIST.md`
 

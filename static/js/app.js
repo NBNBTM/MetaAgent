@@ -191,6 +191,7 @@ function renderMessages(messages) {
 }
 
 function appendMessage(role, content, options = {}) {
+    els.messages.querySelector(".empty-chat")?.remove();
     const wrapper = document.createElement("article");
     wrapper.className = `message ${role}`;
 
@@ -248,60 +249,81 @@ async function submitMessage(event) {
     autoResize(els.input);
     hideMentionBox();
 
-    const params = new URLSearchParams({
-        session_id: state.session.id,
-        selected_agent: state.selectedAgent,
-        userinput: text,
-    });
-    const source = new EventSource(`/stream?${params.toString()}`);
     let assistantNode = null;
-    let closedByServer = false;
-
-    source.onmessage = async (eventMessage) => {
-        const data = JSON.parse(eventMessage.data);
-        if (data.type === "meta") {
-            assistantNode = createAssistantStream(data.selected_agent || state.selectedAgent, data.selected_agent_avatar);
-            state.selectedAgent = data.selected_agent || state.selectedAgent;
-            renderHeader();
-            renderAgents();
-            return;
+    try {
+        const response = await fetch("/stream", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                session_id: state.session.id,
+                selected_agent: state.selectedAgent,
+                userinput: text,
+            }),
+        });
+        if (!response.ok || !response.body) {
+            throw new Error(`Request failed: ${response.status}`);
         }
+
+        await readEventStream(response.body, async (data) => {
+            if (data.type === "meta") {
+                assistantNode = createAssistantStream(data.selected_agent || state.selectedAgent, data.selected_agent_avatar);
+                state.selectedAgent = data.selected_agent || state.selectedAgent;
+                renderHeader();
+                renderAgents();
+                return;
+            }
+            if (!assistantNode) {
+                assistantNode = createAssistantStream(state.selectedAgent);
+            }
+            if (data.type === "content") {
+                assistantNode.raw += data.content || "";
+                assistantNode.bubble.innerHTML = renderMarkdown(assistantNode.raw);
+            }
+            if (data.type === "tool_call") {
+                appendToolCard(assistantNode.stack, `调用工具：${data.name}`, JSON.stringify(data.arguments || {}, null, 2));
+            }
+            if (data.type === "tool_result") {
+                appendToolCard(assistantNode.stack, `工具结果：${data.name}`, data.content, data.is_error);
+            }
+            if (data.type === "agent_updated") {
+                await refreshAgents();
+            }
+            if (data.type === "error") {
+                appendToolCard(assistantNode.stack, "错误", data.content, true);
+            }
+            scrollToBottom();
+        });
+    } catch (error) {
         if (!assistantNode) {
             assistantNode = createAssistantStream(state.selectedAgent);
         }
-        if (data.type === "content") {
-            assistantNode.raw += data.content || "";
-            assistantNode.bubble.innerHTML = renderMarkdown(assistantNode.raw);
-        }
-        if (data.type === "tool_call") {
-            appendToolCard(assistantNode.stack, `调用工具：${data.name}`, JSON.stringify(data.arguments || {}, null, 2));
-        }
-        if (data.type === "tool_result") {
-            appendToolCard(assistantNode.stack, `工具结果：${data.name}`, data.content, data.is_error);
-        }
-        if (data.type === "agent_updated") {
-            await refreshAgents();
-        }
-        if (data.type === "error") {
-            appendToolCard(assistantNode.stack, "错误", data.content, true);
-        }
-        if (data.type === "end") {
-            closedByServer = true;
-            source.close();
-            setComposerEnabled(true);
-            await refreshSessions();
-        }
-        scrollToBottom();
-    };
-
-    source.onerror = async () => {
-        source.close();
-        if (!closedByServer && assistantNode) {
-            appendToolCard(assistantNode.stack, "连接已结束", "如果回复不完整，请重试。", true);
-        }
+        appendToolCard(assistantNode.stack, "连接已结束", error.message || "如果回复不完整，请重试。", true);
+    } finally {
         setComposerEnabled(true);
         await refreshSessions();
-    };
+    }
+}
+
+async function readEventStream(stream, onEvent) {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+        const {value, done} = await reader.read();
+        buffer += decoder.decode(value || new Uint8Array(), {stream: !done});
+        const blocks = buffer.split("\n\n");
+        buffer = blocks.pop() || "";
+        for (const block of blocks) {
+            const payload = block
+                .split("\n")
+                .filter((line) => line.startsWith("data:"))
+                .map((line) => line.slice(5).trimStart())
+                .join("\n");
+            if (payload) await onEvent(JSON.parse(payload));
+        }
+        if (done) break;
+    }
 }
 
 async function createSession() {
@@ -433,8 +455,8 @@ function hideMentionBox() {
 }
 
 function renderMarkdown(content) {
-    const html = window.marked ? window.marked.parse(content || "") : escapeHtml(content || "");
-    if (!window.DOMPurify) return html;
+    if (!window.marked || !window.DOMPurify) return escapeHtml(content || "");
+    const html = window.marked.parse(content || "");
     return window.DOMPurify.sanitize(html, {
         ALLOWED_TAGS: [
             "p", "br", "strong", "em", "u", "h1", "h2", "h3", "h4", "h5", "h6",

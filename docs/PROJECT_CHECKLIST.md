@@ -40,7 +40,8 @@ Private, company-specific, or high-risk local filesystem tools are not enabled i
 Before pushing:
 
 ```bash
-pytest
+python -m pip install -e ".[test]"
+python -m pytest
 python scripts/check_repository_hygiene.py
 git status --ignored --short
 ```
@@ -58,10 +59,16 @@ Configured for the public portfolio repository:
 
 - README demo GIF and static screenshot fallbacks;
 - GitHub Actions test workflow;
+- Python 3.11 and 3.12 test matrix;
+- Docker image build and web-start smoke test;
+- Playwright desktop/mobile browser workflow test;
+- CodeQL analysis for Python and JavaScript;
 - Dependabot for Python and GitHub Actions dependencies;
 - MIT license;
 - Security policy;
 - Contribution guide;
+- issue and pull request templates;
+- changelog and semantic-versioned releases;
 - release notes for published versions.
 
 ## Current Limitations
@@ -70,4 +77,4 @@ Configured for the public portfolio repository:
 - Real LLM reasoning and live tool-calling conversations require a user-provided API key.
 - Uploaded files remain on the local machine unless the user deploys the app elsewhere.
 - Optional external MCP services are disabled unless explicitly configured.
-- `get_internet_time` accepts a caller-provided URL; production deployments should add URL allowlisting and private-address blocking.
+- The internet-time tool only connects to its explicit public-server allowlist and does not follow redirects.
