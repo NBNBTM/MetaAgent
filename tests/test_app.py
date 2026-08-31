@@ -41,9 +41,9 @@ async def test_meta_stream_uses_local_fallback_without_api_key(tmp_path):
     bootstrap = await client.get("/api/bootstrap")
     session_id = (await bootstrap.get_json())["session"]["id"]
 
-    response = await client.get(
+    response = await client.post(
         "/stream",
-        query_string={
+        json={
             "session_id": session_id,
             "selected_agent": "元智能体",
             "userinput": "帮我计算一组数字",
@@ -54,6 +54,12 @@ async def test_meta_stream_uses_local_fallback_without_api_key(tmp_path):
     assert response.status_code == 200
     assert "OPENAI_API_KEY" in body
     assert "agent_updated" in body
+
+    get_response = await client.get(
+        "/stream",
+        query_string={"userinput": "this must not appear in a URL"},
+    )
+    assert get_response.status_code == 405
 
 
 @pytest.mark.asyncio
@@ -69,3 +75,33 @@ async def test_upload_rejects_unsupported_extension(tmp_path):
 
     assert response.status_code == 400
     assert data["success"] is False
+
+
+@pytest.mark.asyncio
+async def test_uploaded_file_is_private_to_owning_browser_user(tmp_path):
+    app = build_app(tmp_path)
+    owner = app.test_client()
+    visitor = app.test_client()
+
+    bootstrap = await owner.get("/api/bootstrap")
+    session_id = (await bootstrap.get_json())["session"]["id"]
+    upload_response = await owner.post(
+        "/api/upload",
+        form={"session_id": session_id},
+        files={
+            "file": FileStorage(
+                stream=BytesIO(b"private demo file"),
+                filename="notes.txt",
+                name="file",
+            )
+        },
+    )
+    upload = (await upload_response.get_json())["upload"]
+
+    own_response = await owner.get(upload["url_path"])
+    await visitor.get("/api/bootstrap")
+    visitor_response = await visitor.get(upload["url_path"])
+
+    assert own_response.status_code == 200
+    assert await own_response.get_data() == b"private demo file"
+    assert visitor_response.status_code == 404

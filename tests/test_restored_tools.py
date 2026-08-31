@@ -74,8 +74,10 @@ async def test_internet_time_uses_requested_url_and_parses_http_date(monkeypatch
         def raise_for_status():
             return None
 
-    def fake_head(url, timeout):
-        requested.update({"url": url, "timeout": timeout})
+    def fake_head(url, timeout, allow_redirects):
+        requested.update(
+            {"url": url, "timeout": timeout, "allow_redirects": allow_redirects}
+        )
         return Response()
 
     internet_time = importlib.import_module("modules.internet_time.internet_time")
@@ -83,14 +85,49 @@ async def test_internet_time_uses_requested_url_and_parses_http_date(monkeypatch
     server = FastMCP("internet-time")
     InternetTime().register(server)
 
-    result = await server.call_tool("get_internet_time", {"server": "https://example.com"})
+    result = await server.call_tool(
+        "get_internet_time",
+        {"server": "https://www.cloudflare.com"},
+    )
 
-    assert requested == {"url": "https://example.com", "timeout": 10}
+    assert requested == {
+        "url": "https://www.cloudflare.com",
+        "timeout": 10,
+        "allow_redirects": False,
+    }
     assert result.structured_content == {
         "datetime": "2025-08-05 14:30:00",
         "weekday": "星期二",
         "timezone": "北京时间",
-        "source": "HTTP Date header from https://example.com",
+        "source": "HTTP Date header from https://www.cloudflare.com",
+    }
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://127.0.0.1:18899",
+        "http://169.254.169.254/latest/meta-data/",
+        "file:///etc/passwd",
+        "https://example.com",
+    ],
+)
+async def test_internet_time_rejects_unapproved_urls(monkeypatch, url):
+    InternetTime, _DataVisualizationModule = load_restored_modules(monkeypatch)
+    internet_time = importlib.import_module("modules.internet_time.internet_time")
+
+    def unexpected_head(*_args, **_kwargs):
+        raise AssertionError("A rejected URL must not trigger a network request")
+
+    monkeypatch.setattr(internet_time.requests, "head", unexpected_head)
+    server = FastMCP("internet-time")
+    InternetTime().register(server)
+
+    result = await server.call_tool("get_internet_time", {"server": url})
+
+    assert result.structured_content == {
+        "error": "Unsupported time server. Use one of the documented public sources."
     }
 
 

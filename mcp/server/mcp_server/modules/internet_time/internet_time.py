@@ -4,6 +4,13 @@ from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime  # 用于解析 HTTP Date 头
 
 
+ALLOWED_TIME_SERVERS = {
+    "https://www.baidu.com",
+    "https://www.cloudflare.com",
+    "https://www.google.com",
+}
+
+
 class InternetTime(ModuleInterface):
     """
     InternetTime 模块
@@ -32,7 +39,7 @@ class InternetTime(ModuleInterface):
         """
 
         @server.tool()
-        def get_internet_time(server: str = "https://www.baidu.com"):
+        def get_internet_time(server: str = "https://www.cloudflare.com"):
             """
             通过 HTTP 头获取标准时间信息（如百度首页的 Date 响应头），包括日期、时间、星期几。
             使用举例：
@@ -40,11 +47,24 @@ class InternetTime(ModuleInterface):
             - 现在的时间
             - 今天星期几
 
-            :param server: HTTP 服务器地址，默认为 https://www.baidu.com
+            :param server: 受信任的公共 HTTP 服务器地址，默认为 https://www.cloudflare.com
             :return: 包含当前日期时间、星期几以及时区的信息字典，如果请求失败则返回 {"error": <error message>}
             """
+            normalized_server = server.rstrip("/")
+            if normalized_server not in ALLOWED_TIME_SERVERS:
+                return {
+                    "error": (
+                        "Unsupported time server. Use one of the documented public "
+                        "sources."
+                    )
+                }
+
             try:
-                response = requests.head(server, timeout=10)
+                response = requests.head(
+                    normalized_server,
+                    timeout=10,
+                    allow_redirects=False,
+                )
                 response.raise_for_status()
                 date_str = response.headers.get('Date')
 
@@ -65,7 +85,7 @@ class InternetTime(ModuleInterface):
                     "datetime": dt_beijing.strftime('%Y-%m-%d %H:%M:%S'),
                     "weekday": weekday_str,
                     "timezone": "北京时间",
-                    "source": f"HTTP Date header from {server}"
+                    "source": f"HTTP Date header from {normalized_server}"
                 }
 
                 return time_info

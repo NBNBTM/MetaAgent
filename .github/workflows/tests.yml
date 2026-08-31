@@ -12,23 +12,97 @@ permissions:
 
 jobs:
   pytest:
+    name: pytest (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test]"
+
+      - name: Run tests
+        run: python -m pytest
+
+  repository-hygiene:
+    name: Repository hygiene
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run tests
-        run: pytest
-
       - name: Check repository hygiene
         run: python scripts/check_repository_hygiene.py
+
+  browser-e2e:
+    name: Browser E2E
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install application and browser
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test,e2e]"
+          python -m playwright install --with-deps chromium
+
+      - name: Run browser tests
+        run: python -m pytest e2e
+
+  docker-smoke-test:
+    name: Docker smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Build image
+        run: docker build --tag metaagent:test .
+
+      - name: Start container
+        run: |
+          docker run --detach --name metaagent-test \
+            --publish 18899:18899 \
+            --env OPENAI_API_KEY= \
+            --env SECRET_KEY=ci-local-only \
+            metaagent:test
+
+      - name: Wait for web app
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:18899/ > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker logs metaagent-test
